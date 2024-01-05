@@ -5,7 +5,7 @@ from tkinter import ttk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 from file_reader import FileReader
-from nodes import SensorNodeIntegral
+from nodes import SensorNodeIntegral, Monitoring
 from sensored_signal import SensoredSignal
 
 class MainApp(Tk):
@@ -32,14 +32,21 @@ class MainApp(Tk):
         dropdown_methods = OptionMenu(self, selected_method, *methods)
         dropdown_methods.pack()
 
+        import_file_checkbutton = ttk.Checkbutton(self, text = "Import data file")
+        import_file_checkbutton.pack()
+
         ## Plots
         figure = plt.Figure(figsize=(15,3), dpi=100)
-        ax1 = figure.add_subplot(111)
+        ax1 = figure.add_subplot(211)
         ax1.set_title('Sampled signal')
+        ax2 = figure.add_subplot(212)
+        ax2.set_title('Monitored signal')
         chart_type = FigureCanvasTkAgg(figure, self)
         chart_type.get_tk_widget().pack()
 
-        self.sensor_node = SensorNodeIntegral(ax1, signal, 0.5, 0.01, 1000)
+        self.monitoring_node = Monitoring(ax2)
+
+        self.sensor_node = SensorNodeIntegral(self.monitoring_node, ax1, signal, 0.5, 0.01, 10)
 
 
 
@@ -53,5 +60,5 @@ class MainApp(Tk):
         super().mainloop()
 
     def start_sensor(self):
-        self.sensor_node.sample(100)
+        self.sensor_node.sample(1000)
 
